@@ -13,6 +13,7 @@ export const CLINIC = {
   email: "drbborthakur@gmail.com",
   instagram: "https://instagram.com/drb_plus",
   facebook: "https://facebook.com/share/1GTB1aSBua/",
+  upiId: "9401216987@airtel",
 };
 
 export const CLINICS = [

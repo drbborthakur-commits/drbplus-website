@@ -439,6 +439,47 @@ function Booking() {
               wallets accepted. The remaining consultation fee is payable
               at the clinic.
             </p>
+
+            <div style={s.orDivider}>
+              <span style={s.orDividerLine} />
+              <span style={s.orDividerText}>or</span>
+              <span style={s.orDividerLine} />
+            </div>
+
+            <a
+              href={buildUpiLink(form)}
+              style={s.btnUpi}
+              onClick={() => {
+                if (!isValid()) {
+                  setErrorMsg(
+                    "Please fill in your name, phone, date, and time first."
+                  );
+                }
+              }}
+            >
+              Pay ₹{BOOKING_AMOUNT_INR} directly via UPI
+            </a>
+            <p style={s.paymentNote}>
+              Opens your UPI app to pay {CLINIC.upiId} directly. After
+              paying, tap below to send us your booking details on
+              WhatsApp so we can confirm your slot.
+            </p>
+            <button
+              type="button"
+              style={s.btnGhostSmall}
+              onClick={() => {
+                if (!isValid()) {
+                  setErrorMsg(
+                    "Please fill in your name, phone, date, and time first."
+                  );
+                  return;
+                }
+                setErrorMsg("");
+                openWhatsAppConfirmation(form);
+              }}
+            >
+              I've paid via UPI — send confirmation
+            </button>
           </form>
         )}
       </div>
@@ -453,6 +494,18 @@ function Field({ label, children }) {
       {children}
     </label>
   );
+}
+
+function buildUpiLink(form) {
+  const note = `DRB PLUS Booking - ${form.name || "Patient"}`.slice(0, 50);
+  const params = new URLSearchParams({
+    pa: CLINIC.upiId,
+    pn: "DRB PLUS Neuro-Psychiatric Clinic",
+    am: String(BOOKING_AMOUNT_INR),
+    cu: "INR",
+    tn: note,
+  });
+  return `upi://pay?${params.toString()}`;
 }
 
 function openWhatsAppConfirmation(form) {
@@ -889,6 +942,49 @@ const s = {
   textarea: { minHeight: 80, resize: "vertical" },
   errorText: { color: "#B3261E", fontSize: 13.5, marginBottom: 12 },
   paymentNote: { fontSize: 12, color: "#6B7590", marginTop: 10 },
+
+  orDivider: {
+    display: "flex",
+    alignItems: "center",
+    gap: 12,
+    margin: "22px 0",
+  },
+  orDividerLine: {
+    flex: 1,
+    height: 1,
+    background: "rgba(27,58,107,0.15)",
+  },
+  orDividerText: {
+    fontSize: 12,
+    color: "#8A93AC",
+    textTransform: "uppercase",
+    letterSpacing: 1,
+  },
+  btnUpi: {
+    display: "block",
+    textAlign: "center",
+    background: "white",
+    color: COLOR.navy,
+    padding: "13px 26px",
+    borderRadius: 999,
+    fontSize: 14.5,
+    fontWeight: 700,
+    textDecoration: "none",
+    border: `1.5px solid ${COLOR.navy}`,
+  },
+  btnGhostSmall: {
+    display: "block",
+    width: "100%",
+    marginTop: 10,
+    background: "none",
+    color: COLOR.coral,
+    padding: "10px 16px",
+    borderRadius: 999,
+    fontSize: 13,
+    fontWeight: 600,
+    border: `1px solid ${COLOR.coral}`,
+    cursor: "pointer",
+  },
 
   paidBox: {
     marginTop: 28,
