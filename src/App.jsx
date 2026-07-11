@@ -258,6 +258,26 @@ function Booking() {
           email: form.email,
         },
         theme: { color: "#1B3A6B" },
+        config: {
+          display: {
+            blocks: {
+              upiBlock: {
+                name: "Pay via UPI",
+                instruments: [{ method: "upi" }],
+              },
+              other: {
+                name: "Other payment methods",
+                instruments: [
+                  { method: "card" },
+                  { method: "netbanking" },
+                  { method: "wallet" },
+                ],
+              },
+            },
+            sequence: ["block.upiBlock", "block.other"],
+            preferences: { show_default_blocks: false },
+          },
+        },
         handler: async function (response) {
           try {
             const verifyRes = await fetch("/api/verify-payment", {
@@ -415,8 +435,9 @@ function Booking() {
                 : `Pay ₹${BOOKING_AMOUNT_INR} & Confirm Booking`}
             </button>
             <p style={s.paymentNote}>
-              Secure payment via Razorpay. The remaining consultation fee
-              is payable at the clinic.
+              Secure payment via Razorpay — UPI, cards, netbanking, and
+              wallets accepted. The remaining consultation fee is payable
+              at the clinic.
             </p>
           </form>
         )}
@@ -647,6 +668,7 @@ const s = {
     display: "flex",
     alignItems: "center",
     textDecoration: "none",
+    flexShrink: 0,
   },
   logoImg: {
     height: 38,
@@ -659,7 +681,8 @@ const s = {
     overflowX: "auto",
     WebkitOverflowScrolling: "touch",
     scrollbarWidth: "none",
-    maxWidth: "56vw",
+    flex: "1 1 auto",
+    minWidth: 0,
   },
   navLink: {
     fontSize: 14,
@@ -669,7 +692,7 @@ const s = {
     whiteSpace: "nowrap",
   },
   navOpenMobile: {},
-  headerActions: { display: "flex", alignItems: "center", gap: 12 },
+  headerActions: { display: "flex", alignItems: "center", gap: 12, flexShrink: 0 },
   headerPhone: {
     fontSize: 13,
     color: COLOR.navy,
@@ -684,6 +707,7 @@ const s = {
     fontSize: 13,
     fontWeight: 600,
     textDecoration: "none",
+    whiteSpace: "nowrap",
   },
   hamburger: { display: "none" },
   hamburgerBar: {},
