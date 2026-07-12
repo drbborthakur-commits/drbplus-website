@@ -23,6 +23,7 @@ export default function App() {
       <Booking />
       <FaqSection openFaq={openFaq} setOpenFaq={setOpenFaq} />
       <Contact />
+      <PreviousVersionLink />
       <Footer />
       <FloatingButtons setChatOpen={setChatOpen} />
       {chatOpen && <ChatModal onClose={() => setChatOpen(false)} />}
@@ -664,6 +665,22 @@ function Contact() {
   );
 }
 
+/* ---------------- Previous Version Link ---------------- */
+function PreviousVersionLink() {
+  return (
+    <div style={s.prevVersionWrap}>
+      <p style={s.prevVersionHeading}>Work with previous version</p>
+      <p style={s.prevVersionText}>
+        Looking for the earlier drbplus.in? We've kept an archived copy
+        of it for reference.
+      </p>
+      <a href="/previous-version.html" style={s.prevVersionLink}>
+        View previous version →
+      </a>
+    </div>
+  );
+}
+
 /* ---------------- Footer ---------------- */
 function Footer() {
   return (
@@ -1140,6 +1157,31 @@ const s = {
     height: 260,
     border: 0,
     borderRadius: 14,
+  },
+
+  prevVersionWrap: {
+    background: "#EDE8DC",
+    padding: "28px 20px",
+    textAlign: "center",
+    borderTop: "1px solid rgba(12,51,89,0.1)",
+  },
+  prevVersionHeading: {
+    fontFamily: FONT_DISPLAY,
+    color: COLOR.navy,
+    fontSize: 18,
+    fontWeight: 600,
+    margin: "0 0 6px",
+  },
+  prevVersionText: {
+    fontSize: 13,
+    color: "#6B7590",
+    margin: "0 0 10px",
+  },
+  prevVersionLink: {
+    fontSize: 13,
+    fontWeight: 600,
+    color: COLOR.coral,
+    textDecoration: "none",
   },
 
   footer: {
