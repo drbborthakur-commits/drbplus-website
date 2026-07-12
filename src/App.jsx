@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   CLINIC,
   CLINICS,
@@ -13,6 +13,7 @@ export default function App() {
 
   return (
     <div style={s.page}>
+      <InstallAppBanner />
       <Header />
       <Hero setChatOpen={setChatOpen} />
       <TrustStrip />
@@ -26,6 +27,79 @@ export default function App() {
       <FloatingButtons setChatOpen={setChatOpen} />
       {chatOpen && <ChatModal onClose={() => setChatOpen(false)} />}
       <GlobalStyle />
+    </div>
+  );
+}
+
+/* ---------------- Install App Banner ---------------- */
+function InstallAppBanner() {
+  const [deferredPrompt, setDeferredPrompt] = useState(null);
+  const [visible, setVisible] = useState(false);
+  const [isIOS, setIsIOS] = useState(false);
+  const [showIOSHelp, setShowIOSHelp] = useState(false);
+
+  useEffect(() => {
+    if (sessionStorage.getItem("drbplus_install_dismissed")) return;
+
+    const standalone =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true;
+    if (standalone) return; // already installed / running as app
+
+    const ua = window.navigator.userAgent;
+    const iOSDevice = /iPad|iPhone|iPod/.test(ua) && !window.MSStream;
+    setIsIOS(iOSDevice);
+
+    if (iOSDevice) {
+      setVisible(true);
+      return;
+    }
+
+    function handler(e) {
+      e.preventDefault();
+      setDeferredPrompt(e);
+      setVisible(true);
+    }
+    window.addEventListener("beforeinstallprompt", handler);
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  function dismiss() {
+    setVisible(false);
+    sessionStorage.setItem("drbplus_install_dismissed", "1");
+  }
+
+  async function handleInstall() {
+    if (isIOS) {
+      setShowIOSHelp(true);
+      return;
+    }
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    await deferredPrompt.userChoice;
+    setDeferredPrompt(null);
+    setVisible(false);
+  }
+
+  if (!visible) return null;
+
+  return (
+    <div style={s.installBanner}>
+      <span style={s.installText}>
+        {showIOSHelp
+          ? "Tap the Share icon below, then \"Add to Home Screen.\""
+          : "Install DRB PLUS as an app on your phone for quick access."}
+      </span>
+      <div style={s.installActions}>
+        {!showIOSHelp && (
+          <button style={s.installBtn} onClick={handleInstall}>
+            Install
+          </button>
+        )}
+        <button style={s.installDismiss} onClick={dismiss} aria-label="Dismiss">
+          ✕
+        </button>
+      </div>
     </div>
   );
 }
@@ -699,6 +773,38 @@ const s = {
     color: COLOR.ink,
     background: COLOR.cream,
     minHeight: "100vh",
+  },
+
+  installBanner: {
+    background: COLOR.navy,
+    color: COLOR.cream,
+    padding: "10px 16px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 12,
+    fontSize: 13,
+  },
+  installText: { flex: 1 },
+  installActions: { display: "flex", alignItems: "center", gap: 10, flexShrink: 0 },
+  installBtn: {
+    background: COLOR.coral,
+    color: "white",
+    border: "none",
+    padding: "7px 14px",
+    borderRadius: 999,
+    fontSize: 12.5,
+    fontWeight: 700,
+    cursor: "pointer",
+    whiteSpace: "nowrap",
+  },
+  installDismiss: {
+    background: "none",
+    border: "none",
+    color: "rgba(244,241,234,0.7)",
+    fontSize: 15,
+    cursor: "pointer",
+    padding: 4,
   },
 
   header: {
