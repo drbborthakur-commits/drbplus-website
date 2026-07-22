@@ -6,6 +6,7 @@ import {
   FAQS,
   BOOKING_AMOUNT_INR,
 } from "./content.js";
+import DayScheduleBooking from "./DayScheduleBooking.jsx";
 
 export default function App() {
   const [chatOpen, setChatOpen] = useState(false);
