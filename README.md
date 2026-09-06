@@ -16,7 +16,17 @@ The static site is the one patients see. Edit that one unless there's a
 reason not to.
 
 `drbplus.in` is still held by the previous developer (Ashim Sen Gupta /
-Alchemist Solutions) on GoDaddy. Nothing on this guide depends on it.
+Alchemist Solutions) on GoDaddy. Nothing here depends on it.
+
+---
+
+## Open items, in order
+
+1. Paste the payment details into `drbplus-com` → `index.html` (section 3 below)
+2. Upload terms.html, privacy.html, refunds.html and add the footer links (section 4)
+3. Replace `payment-qr.jpg` with a QR for the new HDFC UPI ID
+4. Check UPI is enabled in the Razorpay dashboard
+5. Pay ₹1 through the Razorpay link and confirm it settles
 
 ---
 
@@ -40,84 +50,104 @@ the config.
 
 ---
 
-## 2. Razorpay — done
+## 2. Razorpay — account done
 
 Account is **activated**. Cards and Netbanking show green ticks.
 
-Your permanent payment link: **https://razorpay.me/@drbplus**
-
-To put it live:
-1. GitHub → `drbplus-com` → `index.html` → pencil icon
-2. Find the Razorpay entry inside `paymentMethods` — it still has `____`
-3. Replace `____` with `https://razorpay.me/@drbplus`, leave `on: true`
-4. Commit changes
+Permanent payment link: **https://razorpay.me/@drbplus**
 
 Notes:
 - The link lets patients type any amount. The ₹500 is shown on the
-  website, not enforced by Razorpay. Fine for now.
-- Settlements land in your registered bank account, usually T+2 working days.
+  website, not enforced by Razorpay.
+- Settlements land in the registered bank account, usually T+2 working days.
 - Pricing is roughly 2% + GST per transaction.
-
-**Still to check:** whether **UPI** is enabled. Payments home → scroll to
-payment methods → if UPI has no green tick, tap "Enable more methods".
-Most of your patients will pay that way.
-
-**Test once:** pay ₹1 through the link yourself, then check Transactions
-and Settlements to confirm it reaches the bank.
+- Still to check: whether **UPI** is enabled. Payments home → payment
+  methods → if UPI has no green tick, tap "Enable more methods". Most
+  patients will pay that way.
+- Test once: pay ₹1 through the link, then check Transactions and
+  Settlements.
 
 ---
 
-## 3. Other payment lines still showing `____`
+## 3. Payment details for the config
 
-These are live on the page with blanks in them. Either fill them in or
-set `on: false`:
+All confirmed. These go into `drbplus-com` → `index.html`, replacing the
+`____` placeholders:
 
-- Bank transfer (account no. + IFSC + branch)
-- PhonePe / Paytm number
-- Cheque (payable-to name)
+| Method | Value |
+|---|---|
+| UPI | `9401216987.1@hdfc` (replaces the old Airtel ID) |
+| Razorpay | `https://razorpay.me/@drbplus` |
+| Bank transfer | DRB PLUS PRIVATE LIMITED · A/c 99999401216987 · HDFC Bank · IFSC HDFC0005526 |
+| GPay / PhonePe / Paytm | 9435166121 |
+| Cheque | Payable to **DRB PLUS PRIVATE LIMITED** |
+| Cash, card, send-screenshot | Already configured |
 
-UPI (`9401216987@airtel`), cash, card, Razorpay and send-screenshot are
-already filled.
+Two things to get right:
+- `upiName` should match the account holder name as the bank prints it,
+  or transfers from some apps flag a name mismatch.
+- `payment-qr.jpg` in the repo is still the QR for the **old Airtel** UPI
+  ID. Generate a new QR from the HDFC app and upload it over the same
+  filename, or the scan and the printed ID won't match.
 
 ---
 
-## 4. Pages Razorpay expects on a payment website
+## 4. Policy pages
 
-Razorpay's compliance checks look for **Terms & Conditions, Privacy
-Policy, Refund/Cancellation Policy and Contact Us**. drbplus.com shows
-the fee and contact details but has none of the first three as pages.
-Not blocking anything right now since the account is already activated,
-but worth adding — ask me and I'll write all four.
+Written 7 September 2026: `terms.html`, `privacy.html`, `refunds.html`.
+Standalone pages, same navy/cream styling, no build step.
+
+**To publish:** `drbplus-com` → Add file → Upload files → all three →
+Commit. Then add to the footer in `index.html`:
+
+```html
+<a href="terms.html">Terms</a> ·
+<a href="privacy.html">Privacy</a> ·
+<a href="refunds.html">Refunds</a>
+```
+
+Two policy decisions made in `refunds.html`, change them if you disagree:
+- Full refund if cancelled **at least 4 hours** before the appointment
+- No-shows forfeit the fee, but get one adjustment against a future visit
+
+These cover what Razorpay's compliance checks look for. They are not
+lawyer-drafted — worth a local legal check if a dispute ever arises.
 
 ---
 
 ## 5. Still outstanding
 
 - Clinic photographs (section stays hidden until added)
-- Google review link — needs a Google Business Profile for each clinic;
-  this also fixes the map pins
+- Google Business Profile for Margherita and Digboi — fixes the map pins
+  and supplies the review link the site is waiting for
 - GA4 analytics ID
 - Pharmacy section — written and commented out in the HTML, ready to
   switch on when it opens
-- Assamese version — offered, pending your line-by-line check of the
+- Assamese version — offered, pending a line-by-line check of the
   medical wording
 
 ---
 
-## 6. The React app (optional, only if you go back to it)
+## 6. The React app
 
-If you ever point the React site at a domain, it uses server-side
-Razorpay checkout instead of a payment link, and needs API keys:
+Kept as a backup. Not linked from anywhere and not worth maintaining in
+parallel — every fee or timing change would have to be made twice.
+
+Its `index.html` was corrected on 7 September 2026: credentials now read
+MBBS, D.P.M. (previously said MD Psychiatry), Makum added, and a canonical
+tag added pointing at drbplus.com so search engines treat this copy as a
+duplicate rather than a competitor.
+
+If it is ever brought back into use, it needs Razorpay API keys rather
+than a payment link:
 
 1. Razorpay dashboard → Account & Settings → API Keys → Generate Key
-2. Copy the **Key ID** and **Key Secret**
-3. Vercel → `drbplus-website` project → Settings → Environment Variables:
+2. Vercel → `drbplus-website` → Settings → Environment Variables:
    - `RAZORPAY_KEY_ID`
    - `RAZORPAY_KEY_SECRET`
-4. Redeploy
+3. Redeploy
 
-Keep the Key Secret private — never paste it into `index.html` or any
-public repo.
+Never paste the Key Secret into `index.html` or any public repo.
 
 ---
 
